@@ -18,12 +18,13 @@ module.exports = function (passport) {
   passport.use(new InstagramStrategy({
     clientID: Auth.clientId,
     clientSecret: Auth.clientSecret,
-    callbackURL: "http://localhost:8000/auth/instagram/callback"
+    callbackURL: "https://stark-gorge-4936.herokuapp.com/auth/instagram/callback"
     },
 //____________________________________________________________________________
 //If User isn't stored in our database, create a new user and store the Instagram ID in our database
 
     function(accessToken, refreshToken, profile, done) {
+      console.log("this is the profile: ", profile);
       db.model('User').fetchById({
         instagram_id: profile.id
       }).then(function(user) {
