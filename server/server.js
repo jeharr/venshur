@@ -5,6 +5,11 @@ var http = require('http');
 require('../db/models/user');
 require("../db/models/trip");
 require("../db/models/photo");
+
+require('../db/collections/users');
+require("../db/collections/trips");
+require("../db/collections/photos");
+
 var passport = require("passport");
 
 var app = express();
@@ -22,13 +27,25 @@ app.use(passport.session());
 
 app.use(express.static(__dirname + "/client"));
 
-app.get("/", function (req, res) {
-  app.render("index")
+app.get("/", function (req, res, next) {
+  res.sendFile('/index.html');
+});
 
-// Handle the Index Page
-// Pull all Trip data of all users w/ associated photos from db to post on page
+app.get('/api/trips', function(req, res){
+  db.collection('Trips').fetchAll()
+  .then(function(trips){
+    res.json({trips: trips.toJSON()});
+  })
+});
 
-})
+// this needs checking
+// app.get('/api/photos', function(req, res){
+//   db.collection('Photos').fetchByTrip(???)
+//   .then(function(photos){
+//     res.json({photos: photos.toJSON()});
+//   })
+// });
+
 //Direct to Instagram Login
 app.get('/auth/instagram',
   passport.authenticate('instagram'));
@@ -73,28 +90,7 @@ app.post('/api/trip', function (req, res) {
   // filter for newTrip tag we just created
   // add photos to the db with associated trip Id
 
-
-
-
 });
 
-app.listen(8000);
-console.log("listening on Port 8000...")
-// USERS:
-
-  // GET 1 user (with trips)
-
-  // POST 1 user
-
-
-// TRIPS:
-
-  // GET all trips (with users)
-
-  // GET 1 trip (with photos)
-
-  // POST 1 trip:
-    // call instafeed
-    // save tag(trip name) & photos(with user & trip IDs) data to our DB
-    // respond with OK
-    // return trip/photos data ???
+app.listen(process.env.PORT || 8000);
+console.log("listening...")
